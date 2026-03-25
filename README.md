@@ -1,2 +1,2 @@
-# calculator
+# Calculator
 1 + 1 = 3

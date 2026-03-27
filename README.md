@@ -5,7 +5,11 @@
 - Easy to use, easy to extend — perfect for practicing UI + logic in Qt.
 
 ### Preview
-
+<p align="center">
+  <img src="preview.png" alt="App Preview" width="400"/>
+  <br/>
+  <em>Simple Qt Calculator UI</em>
+</p>
 
 
 

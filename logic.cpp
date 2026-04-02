@@ -3,96 +3,99 @@
 #include <stack>
 using namespace std;
 
-int sosanhTT(char op) 
+int getPrecedence(char op) 
 {
     if(op == '+' || op == '-') return 1;
     if(op == '*' || op == '/') return 2;
     return 0;
 }
 
-double tinhcapPT(double a, double b, char c) 
+double applyOperation(double a, double b, char op) 
 {
-    switch (c)
+    switch (op)
     {
-        case '+': return a+ b;
-        case '-': return a- b;
-        case '*': return a* b;
+        case '+': return a + b;
+        case '-': return a - b;
+        case '*': return a * b;
         case '/': 
-            if(b == 0) cout << "Loi, khong the chia cho 0" << endl; return 0;
+            if(b == 0) {
+                cout << "Error: Division by zero!" << endl;
+                return 0;
+            }
             return a / b;
     }
     return 0;
 }
 
-double tinhBT(string s)
+double evaluateExpression(string expr)
 {
-    stack<double>v;
-    stack<char>ops;
+    stack<double> values;
+    stack<char> operators;
 
-    for(int i = 0 ; i < s.size(); i++)
+    for(int i = 0; i < expr.size(); i++)
     {
-        if(s[i] == ' ') continue;
+        if(expr[i] == ' ') continue;
 
-        if(s[i] >= '0' && s[i] <= '9') 
+        if(expr[i] >= '0' && expr[i] <= '9') 
         {
             double val = 0;
-            while(i < s.length() && s[i] >= '0' && s[i] <= '9')
+            while(i < expr.length() && expr[i] >= '0' && expr[i] <= '9')
             {
-                val = val * 10 + (s[i] - '0');
+                val = val * 10 + (expr[i] - '0');
                 i++;
             }
-            v.push(val);
-            i--; //lay toan tu
+            values.push(val);
+            i--; 
         }
 
-        else if(s[i] == '(')
+        else if(expr[i] == '(')
         {
-            ops.push(s[i]);
+            operators.push(expr[i]);
         }
         
-        else if(s[i] == ')') 
+        else if(expr[i] == ')') 
         {
-            while(ops.empty() == false && ops.top() != '(')
+            while(!operators.empty() && operators.top() != '(')
             {
-                double b = v.top(); v.pop();
-                double a = v.top(); v.pop();
-                char c = ops.top(); ops.pop();
-                v.push(tinhcapPT(a,b,c));
+                double b = values.top(); values.pop();
+                double a = values.top(); values.pop();
+                char op = operators.top(); operators.pop();
+                values.push(applyOperation(a, b, op));
             }
-            if(ops.empty() == false) ops.pop();
+            if(!operators.empty()) operators.pop();
         }
 
-        else  //tim thay dau phep tinh
+        else  
         {
-            while(ops.empty() == false && sosanhTT(ops.top()) >= sosanhTT(s[i]))
+            while(!operators.empty() && getPrecedence(operators.top()) >= getPrecedence(expr[i]))
             {
-                double b = v.top(); v.pop();
-                double a = v.top(); v.pop();
-                char op = ops.top(); ops.pop();
-                v.push(tinhcapPT(a,b,op));
+                double b = values.top(); values.pop();
+                double a = values.top(); values.pop();
+                char op = operators.top(); operators.pop();
+                values.push(applyOperation(a, b, op));
             }
-            ops.push(s[i]); // them phan tu
+            operators.push(expr[i]); 
         }
     }
-    while(ops.empty() == false)
+
+    while(!operators.empty())
     {
-        double b = v.top(); v.pop();
-        double a = v.top(); v.pop();
-        char op = ops.top(); ops.pop();
-        v.push(tinhcapPT(a,b,op));
+        double b = values.top(); values.pop();
+        double a = values.top(); values.pop();
+        char op = operators.top(); operators.pop();
+        values.push(applyOperation(a, b, op));
     }
 
-    return v.top();
+    return values.top();
 }
-
 
 int main()
 {
-    string s;
-    cout << "Nhap vao bieu thuc: " << endl;
-    getline(cin, s);
+    string expression;
+    cout << "Enter expression: " << endl;
+    getline(cin, expression);
 
-    cout << "Ket qua: " << tinhBT(s) << endl;
+    cout << "Result: " << evaluateExpression(expression) << endl;
     
     return 0;
 }
